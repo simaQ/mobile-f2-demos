@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+  <title>层叠柱状图</title>
+
+</head>
+<body>
+<div>
+    <a href="./index.html">返回</a>
+  <canvas id="mountNode"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/f2.js"></script>
+<script>
+    const data = [
+      { x: '分类一', y: [ 76, 100 ] },
+      { x: '分类二', y: [ 56, 108 ] },
+      { x: '分类三', y: [ 38, 129 ] },
+      { x: '分类四', y: [ 58, 155 ] },
+      { x: '分类五', y: [ 45, 120 ] },
+      { x: '分类六', y: [ 23, 99 ] },
+      { x: '分类七', y: [ 18, 56 ] },
+      { x: '分类八', y: [ 18, 34 ] },
+    ];
+    const chart = new F2.Chart({
+      id: 'mountNode',
+      pixelRatio: window.devicePixelRatio,
+      width: window.innerWidth,
+      height: 200
+    });
+    chart.source(data);
+    chart.tooltip({
+      showItemMarker: false,
+      onShow(ev) {
+        const { items } = ev;
+        items[0].name = '范围';
+        const value = items[0].value;
+        items[0].value = value[0] + ' 至 ' + value[1];
+      }
+    });
+    chart.interval().position('x*y');
+    chart.render();
+</script>
+</body>
+</html>

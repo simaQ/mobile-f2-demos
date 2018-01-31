@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+
+  <title>堆叠条形图</title>
+</head>
+<body>
+<div>
+    <a href="./index.html">返回</a>
+  <canvas id="mountNode"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+<script src="js/f2.js"></script>
+<script>
+  const data = [
+    { State: 'WY', 年龄段 : '小于5岁', 人口数量: 25635 },
+    { State: 'WY', 年龄段 : '5至13岁', 人口数量: 1890 },
+    { State: 'WY', 年龄段 : '14至17岁', 人口数量: 9314 },
+    { State: 'DC', 年龄段 : '小于5岁', 人口数量: 30352 },
+    { State: 'DC', 年龄段 : '5至13岁', 人口数量: 20439 },
+    { State: 'DC', 年龄段 : '14至17岁', 人口数量: 10225 },
+    { State: 'VT', 年龄段 : '小于5岁', 人口数量: 38253 },
+    { State: 'VT', 年龄段 : '5至13岁', 人口数量: 42538 },
+    { State: 'VT', 年龄段 : '14至17岁', 人口数量: 15757 },
+    { State: 'ND', 年龄段 : '小于5岁', 人口数量: 51896 },
+    { State: 'ND', 年龄段 : '5至13岁', 人口数量: 67358 },
+    { State: 'ND', 年龄段 : '14至17岁', 人口数量: 18794 },
+    { State: 'AK', 年龄段 : '小于5岁', 人口数量: 72083 },
+    { State: 'AK', 年龄段 : '5至13岁', 人口数量: 85640 },
+    { State: 'AK', 年龄段 : '14至17岁', 人口数量: 22153 }
+  ];
+  const chart = new F2.Chart({
+    id: 'mountNode',
+    width: window.innerWidth,
+    height: 260,
+    pixelRatio: window.devicePixelRatio
+  });
+
+  chart.source(data);
+  chart.coord({
+    transposed: true
+  });
+  chart.tooltip({
+    custom(obj) {
+      const legend = chart.get('legendController').legends.top[0];
+      const tooltipItems = obj.items;
+      const legendItems = legend.items;
+      const map = {};
+      legendItems.map(item => {
+        map[item.name] = _.clone(item);
+      });
+      tooltipItems.map(item => {
+        const { name, value } = item;
+        if (map[name]) {
+          map[name].value = (value);
+        }
+      });
+      legend.setItems(Object.values(map));
+    },
+    onHide(tooltip) {
+      const legend = chart.get('legendController').legends.top[0];
+      legend.setItems(chart.getLegendItems().country);
+    }
+  });
+  chart.interval().position('State*人口数量').color('年龄段').adjust('stack');
+
+  chart.render();
+</script>
+</body>
+</html>
