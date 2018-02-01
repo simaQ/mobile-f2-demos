@@ -67,6 +67,11 @@ h1 {
     text-align:center;
 }
 
+a {
+    display: block;
+    margin-top: 50px;
+}
+
 .event {
     border-radius:4px;
     -webkit-border-radius:4px;
