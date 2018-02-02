@@ -7,7 +7,7 @@
     <meta name="msapplication-tap-highlight" content="no" />
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
     <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" /> -->
     <!-- Good default declaration:
     * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
     * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
@@ -19,50 +19,75 @@
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
 
     <link rel="stylesheet" type="text/css" href="css/index.css" />
-    <title>Hello World</title>
+    <link rel="stylesheet" type="text/css" href="https://at.alicdn.com/t/font_470089_zi11p1tyqf7s0pb9.css" />
+    <title>F2@3.1 Demos</title>
+    <style>
+        .intro {
+            background: #F8FAFE;
+            /*min-height: 725px;*/
+            padding: 88px 35px 100px;
+        }
+        .intro h1 {
+            margin: 48px 0;
+            font-size: 40px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.85);
+        }
+        .intro p {
+            margin-bottom: 0;
+            font-size: 16px;
+            line-height: 36px;
+            font-weight: 300;
+            margin: 0;
+            margin-bottom: 0px;
+        }
+    </style>
 </head>
 
-<body>
-  <ul>
-    <li><a href="./area-00.html">面积图</a></li>
-    <li><a href="./area-01.html">带负值的面积图</a></li>
-    <li><a href="./area-02.html">百分比层叠面积图</a></li>
-    <li><a href="./area-03.html">层叠面积图(不带图例)</a></li>
-    <li><a href="./area-04.html">层叠面积图(不带 tooltip)</a></li>
+<body class="drawer-open">
+    <header class="navbar">
+      <a class="navbar-brand" href="#"><img src="https://gw.alipayobjects.com/os/s/prod/antv/assets/image/logo-with-text-73b8a.svg" alt=""> </a>
+    </header>
 
-    <li><a href="./bar-00.html">条形图</a></li>
-    <li><a href="./bar-01.html">分组条形图</a></li>
-    <li><a href="./bar-02.html">堆叠条形图(tooltip + legend)</a></li>
-    <li><a href="./bar-03.html">堆叠条形图(不带 tooltip)</a></li>
-    <li><a href="./bar-04.html">条形区间图</a></li>
+    <section class="intro">
+        <h1 style="">F2 移动端图表库</h1>
+        <p>F2 是面向移动端的一套基于可视化图形语法的图表库，具有精简、高性能、易扩展的特性。适用于对性能、大小、扩展性要求严苛的场景。</p>
+    </section>
 
-    <li><a href="./column-00.html">柱状图</a></li>
-    <li><a href="./column-01.html">分组柱状图</a></li>
-    <li><a href="./column-02.html">分组柱状图(tooltip + legend)</a></li>
-    <li><a href="./column-03.html">百分比层叠柱状图</a></li>
-    <li><a href="./column-04.html">百分比层叠柱状图(tooltip + legend)</a></li>
-    <li><a href="./column-05.html">层叠柱状图</a></li>
-    <li><a href="./column-06.html">层叠柱状图</a></li>
+    <div id="mySidenav" class="sidenav">
+      <a href="./line.html">折线图</a>
+      <a href="./area.html">面积图</a>
+      <a href="./bar.html">条形图</a>
+      <a href="./column.html">柱状图</a>
+      <a href="./pie.html">饼环图</a>
+      <a href="./scatter.html">散点图</a>
+      <a href="./radar.html">雷达图</a>
+    </div>
 
-    <li><a href="./line-00.html">折线图</a></li>
-    <li><a href="./line-01.html">折线图（时间轴）</a></li>
-    <li><a href="./line-02.html">折线图（带点）</a></li>
-    <li><a href="./line-03.html">多条折线(只带图例)</a></li>
-    <li><a href="./line-04.html">多条折线(只带 tooltip)</a></li>
-    <li><a href="./line-05.html">多条折线(tooltip 同 legend 合体)</a></li>
+    <!-- <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; open</span> -->
+    <div class="drawer-toggle">
+      <span class="iconfont icon-menu-fold"></span>
+    </div>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script>
+    var $body = $(document.body);
+    var DRAWER_TOGGLE_SELECTOR = '.drawer-toggle';
+    var DRAWER_OPEN = 'drawer-open';
+    var $toggle = $(DRAWER_TOGGLE_SELECTOR);
 
-    <li><a href="./pie-00.html">饼图</a></li>
-    <li><a href="./pie-01.html">环图</a></li>
-
-    <li><a href="./polar-00.html">极坐标下的柱状图</a></li>
-
-    <li><a href="./radar-00.html">雷达图</a></li>
-    <li><a href="./radar-01.html">雷达图（面积图）</a></li>
-
-    <li><a href="./scatter-01.html">散点图</a></li>
-    <li><a href="./scatter-02.html">多色散点图</a></li>
-    <li><a href="./scatter-03.html">气泡图</a></li>
-  </ul>
+    $toggle.on('click', function () {
+        $body.toggleClass(DRAWER_OPEN);
+        if ($body.hasClass(DRAWER_OPEN)) {
+            $toggle.find('.iconfont').removeClass('icon-menu-fold').addClass('icon-menu-unfold');
+            $('#mySidenav').css('width', 0);
+            $toggle.css('left', 0);
+        } else {
+            $toggle.find('.iconfont').removeClass('icon-menu-unfold').addClass('icon-menu-fold');
+            $('#mySidenav').css('width', '250px');
+            $toggle.css('left', '250px');
+        }
+    });
+    </script>
 </body>
 
 </html>

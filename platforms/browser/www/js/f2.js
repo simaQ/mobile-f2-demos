@@ -4490,7 +4490,7 @@ var Theme = {
   pixelRatio: 1,
   padding: 'auto',
   appendPadding: 15,
-  colors: ['#1890FF', '#73C9E6', '#13C2C2', '#6CD9B3', '#2FC25B', '#9DD96C', '#FACC14', '#E6965C', '#F04864', '#D66BCA', '#8543E0', '#8E77ED', '#3436C7', '#737EE6', '#223273', '#7EA2E6'],
+  colors: ['#1890FF', '#2FC25B', '#FACC14', '#223273', '#8543E0', '#13C2C2', '#3436C7', '#F04864'],
   shapes: {
     line: ['line', 'dash'],
     point: ['circle', 'hollowCircle']
@@ -4523,8 +4523,11 @@ var Theme = {
       lineWidth: 0,
       size: 4 // 圆的默认半径
     },
+    interval: {
+      fillOpacity: 0.85
+    },
     area: {
-      fillOpacity: 0.4 // TODO: 需要确认
+      fillOpacity: 0.3
     }
   },
   _defaultAxis: defaultAxis
@@ -4995,6 +4998,7 @@ module.exports = Interval;
 var Util = __webpack_require__(0);
 var Shape = __webpack_require__(4);
 var Vector2 = __webpack_require__(5);
+var Global = __webpack_require__(1);
 
 function getRectPoints(cfg) {
   var x = cfg.x,
@@ -5060,7 +5064,7 @@ Shape.registerShape('interval', 'rect', {
     var points = this.parsePoints(cfg.points);
     var style = Util.mix({
       fill: cfg.color
-    }, cfg.style);
+    }, Global.shape.interval, cfg.style);
     if (cfg.isInCircle) {
       var newPoints = points.slice(0);
       if (this._coord.transposed) {
@@ -5781,7 +5785,7 @@ var Chart = function (_Base) {
     var colDefs = this.get('colDefs');
     if (colDefs) {
       var scaleController = this.get('scaleController');
-      scaleController.defs = colDefs;
+      Util.mix(scaleController.defs, colDefs);
     }
   };
 
@@ -5793,9 +5797,9 @@ var Chart = function (_Base) {
     self.set('scaleController', new ScaleController());
     self.set('axisController', new AxisController({
       frontPlot: self.get('frontPlot'),
-      backPlot: self.get('backPlot')
+      backPlot: self.get('backPlot'),
+      chart: self
     }));
-    self.initColDefs();
     Chart.plugins.notify(self, 'init'); // TODO: beforeInit afterInit
   };
 
@@ -5821,8 +5825,20 @@ var Chart = function (_Base) {
   Chart.prototype.source = function source(data, colDefs) {
     this.set('data', data);
     if (colDefs) {
-      this.set('colDefs', colDefs);
+      this.scale(colDefs);
     }
+    return this;
+  };
+
+  Chart.prototype.scale = function scale(field, cfg) {
+    var colDefs = this.get('colDefs') || {};
+    if (Util.isObject(field)) {
+      Util.mix(colDefs, field);
+    } else {
+      colDefs[field] = cfg;
+    }
+
+    this.set('colDefs', colDefs);
     this.initColDefs();
     return this;
   };
@@ -6119,7 +6135,7 @@ var Chart = function (_Base) {
     var xScale = this.getXScale();
     var yScales = this.getYScales();
     var coord = this.get('coord');
-    axisController.createAxis(coord, xScale, yScales, this);
+    axisController.createAxis(coord, xScale, yScales);
   };
 
   Chart.prototype._isAutoPadding = function _isAutoPadding() {
@@ -7093,38 +7109,62 @@ var AxisController = function () {
     return !axisCfg || axisCfg[field] === false;
   };
 
-  AxisController.prototype._getLinePosition = function _getLinePosition(scale, dimType, index) {
+  AxisController.prototype._getLinePosition = function _getLinePosition(scale, dimType, index, transposed) {
     var position = '';
     var field = scale.field;
     var axisCfg = this.axisCfg;
     if (axisCfg[field] && axisCfg[field].position) {
       position = axisCfg[field].position;
     } else if (dimType === 'x') {
-      position = 'bottom';
+      position = transposed ? 'left' : 'bottom';
     } else if (dimType === 'y') {
       position = index ? 'right' : 'left';
+      if (transposed) {
+        position = 'bottom';
+      }
     }
 
     return position;
   };
 
-  AxisController.prototype._getLineCfg = function _getLineCfg(coord, position) {
+  AxisController.prototype._getLineCfg = function _getLineCfg(coord, dimType, index) {
     var start = void 0;
     var end = void 0;
     var factor = 1; // 文本的对齐方式，是顺时针方向还是逆时针方向
-    if (position === 'bottom') {
+    if (dimType === 'x') {
       // x轴的坐标轴,底部的横坐标
-      start = { x: 0, y: 0 };
-      end = { x: 1, y: 0 };
-    } else if (position === 'right') {
-      // 左侧 Y 轴
-      start = { x: 1, y: 0 };
-      end = { x: 1, y: 1 };
-    } else if (position === 'left') {
-      // 右侧 Y 轴
-      start = { x: 0, y: 0 };
-      end = { x: 0, y: 1 };
-      factor = -1;
+      start = {
+        x: 0,
+        y: 0
+      };
+      end = {
+        x: 1,
+        y: 0
+      };
+    } else {
+      // y轴坐标轴
+      if (index) {
+        // 多轴的情况
+        start = {
+          x: 1,
+          y: 0
+        };
+        end = {
+          x: 1,
+          y: 1
+        };
+      } else {
+        // 单个y轴，或者第一个y轴
+        start = {
+          x: 0,
+          y: 0
+        };
+        end = {
+          x: 0,
+          y: 1
+        };
+        factor = -1;
+      }
     }
     if (coord.transposed) {
       factor *= -1;
@@ -7231,9 +7271,9 @@ var AxisController = function () {
     var defaultCfg = void 0;
     if (coordType === 'cartesian' || coordType === 'rect') {
       // 直角坐标系下
-      var position = self._getLinePosition(scale, dimType, index);
+      var position = self._getLinePosition(scale, dimType, index, transposed);
       defaultCfg = Global.axis[position];
-      defaultCfg.position = position;
+      defaultCfg.index = index;
       type = 'Line';
       key = position;
     } else {
@@ -7257,7 +7297,7 @@ var AxisController = function () {
     this.axes[key] = cfg;
   };
 
-  AxisController.prototype.createAxis = function createAxis(coord, xScale, yScales, chart) {
+  AxisController.prototype.createAxis = function createAxis(coord, xScale, yScales) {
     var self = this;
     if (xScale && !self._isHide(xScale.field)) {
       self._createAxis(coord, xScale, yScales[0], 'x'); // 绘制 x 轴
@@ -7269,6 +7309,7 @@ var AxisController = function () {
     });
 
     var axes = this.axes;
+    var chart = self.chart;
     if (chart._isAutoPadding()) {
       var userPadding = Util.parsePadding(chart.get('padding'));
       var appendPadding = chart.get('appendPadding');
@@ -7280,12 +7321,14 @@ var AxisController = function () {
       };
 
       var padding = [userPadding[0] === 'auto' ? 0 : userPadding[0], userPadding[1] === 'auto' ? 0 : userPadding[1], userPadding[2] === 'auto' ? 0 : userPadding[2], userPadding[3] === 'auto' ? 0 : userPadding[3]];
+
       padding[0] += legendRange.top + appendPadding * 2; // top 需要给 tooltip 留一些距离
       padding[1] += legendRange.right + appendPadding;
       padding[2] += legendRange.bottom + appendPadding;
       padding[3] += legendRange.left + appendPadding;
 
       if (coord.isPolar) {
+        // 极坐标
         var circleAxis = axes.circle;
         if (circleAxis) {
           var maxHeight = circleAxis.maxHeight,
@@ -7298,38 +7341,42 @@ var AxisController = function () {
           padding[3] += maxWidth + labelOffset;
         }
       } else {
+        // 直角坐标系
         if (axes.right && userPadding[1] === 'auto') {
           var _axes$right = axes.right,
               _maxWidth = _axes$right.maxWidth,
-              _maxHeight = _axes$right.maxHeight,
               _labelOffset = _axes$right.labelOffset;
 
           padding[1] += _maxWidth + _labelOffset;
-          padding[0] = Math.max(_maxHeight, padding[0]);
-          padding[2] = Math.max(_maxHeight, padding[2]);
+          // padding[0] = Math.max(maxHeight, padding[0]);
+          // padding[2] = Math.max(maxHeight, padding[2]);
         }
 
         if (axes.left && userPadding[3] === 'auto') {
           var _axes$left = axes.left,
               _maxWidth2 = _axes$left.maxWidth,
-              _maxHeight2 = _axes$left.maxHeight,
               _labelOffset2 = _axes$left.labelOffset;
 
           padding[3] += _maxWidth2 + _labelOffset2;
-          padding[0] = Math.max(_maxHeight2, padding[0]);
-          padding[2] = Math.max(_maxHeight2, padding[2]);
+          // padding[0] = Math.max(maxHeight, padding[0]);
+          // padding[2] = Math.max(maxHeight, padding[2]);
         }
 
         if (axes.bottom && userPadding[2] === 'auto') {
           var _axes$bottom = axes.bottom,
-              _maxWidth3 = _axes$bottom.maxWidth,
-              _maxHeight3 = _axes$bottom.maxHeight,
+              _maxHeight = _axes$bottom.maxHeight,
               _labelOffset3 = _axes$bottom.labelOffset;
 
-          padding[2] += _maxHeight3 + _labelOffset3;
-          padding[1] = Math.max(_maxWidth3, padding[1]);
-          padding[3] = Math.max(_maxWidth3, padding[3]);
+          padding[2] += _maxHeight + _labelOffset3;
+          // padding[1] = Math.max(maxWidth, padding[1]);
+          // padding[3] = Math.max(maxWidth, padding[3]);
         }
+
+        // if (coord.transposed) { // 坐标轴发生转置
+        //   const temp = padding[2];
+        //   padding[2] = padding[3];
+        //   padding[3] = temp;
+        // }
       }
 
       chart._updateLayout(padding);
@@ -7337,11 +7384,11 @@ var AxisController = function () {
 
     Util.each(axes, function (axis) {
       var type = axis.type,
-          position = axis.position,
           grid = axis.grid,
           verticalScale = axis.verticalScale,
           ticks = axis.ticks,
-          dimType = axis.dimType;
+          dimType = axis.dimType,
+          index = axis.index;
 
       var appendCfg = void 0;
       if (coord.isPolar) {
@@ -7351,7 +7398,7 @@ var AxisController = function () {
           appendCfg = self._getCircleCfg(coord);
         }
       } else {
-        appendCfg = self._getLineCfg(coord, position);
+        appendCfg = self._getLineCfg(coord, dimType, index);
       }
 
       if (grid && verticalScale) {
@@ -10517,10 +10564,10 @@ function getOffsetFromAlign(alignX, alignY, width, height) {
   } else if (alignX === 'left' && alignY === 'middle') {
     result[0] = 0;
     result[1] = Math.floor(-height / 2);
-  } else if (alignX === 'middle' && alignY === 'bottom') {
+  } else if (alignX === 'center' && alignY === 'bottom') {
     result[0] = Math.floor(-width / 2);
     result[1] = Math.floor(-height);
-  } else if (alignX === 'middle' && alignY === 'top') {
+  } else if (alignX === 'center' && alignY === 'top') {
     result[0] = Math.floor(-width / 2);
     result[1] = 0;
   } else {
@@ -10549,10 +10596,10 @@ var Html = function (_GuideBase) {
        */
       position: null,
       /**
-       * 水平方向对齐方式，可取值 'left'、'middle'、'right'
+       * 水平方向对齐方式，可取值 'left'、'center'、'right'
        * @type {String}
        */
-      alignX: 'middle',
+      alignX: 'center',
       /**
        * 垂直方向对齐方式，可取值 'top'、'middle'、'bottom'
        * @type {String}
@@ -11539,7 +11586,7 @@ var TooltipController = function () {
       }, tooltipCfg.tooltipMarkerStyle);
     } else {
       cfg.style = Util.mix({
-        radius: 5,
+        radius: 4,
         fill: '#fff',
         lineWidth: 2
       }, tooltipCfg.tooltipMarkerStyle);
@@ -12332,3 +12379,4 @@ module.exports = Schema;
 /***/ })
 /******/ ]);
 });
+//# sourceMappingURL=f2.js.map
