@@ -521,11 +521,14 @@ var Shape = function (_Element) {
     return _possibleConstructorReturn(this, _Element.apply(this, arguments));
   }
 
-  Shape.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Element.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      isShape: true
-    });
+  Shape.prototype._initProperties = function _initProperties() {
+    this._attrs = {
+      zIndex: 0,
+      visible: true,
+      destroyed: false,
+      isShape: true,
+      attrs: {}
+    };
   };
 
   Shape.prototype.drawInner = function drawInner(context) {
@@ -604,14 +607,14 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var Base = __webpack_require__(9);
+var Base = __webpack_require__(16);
 var GROUP_ATTRS = ['color', 'size', 'shape'];
 var FIELD_ORIGIN = '_origin';
 var FIELD_ORIGIN_Y = '_originY';
 var Global = __webpack_require__(1);
 var Attr = __webpack_require__(27);
 var Shape = __webpack_require__(4);
-var Adjust = __webpack_require__(11);
+var Adjust = __webpack_require__(10);
 
 function parseFields(field) {
   if (Util.isArray(field)) {
@@ -853,7 +856,6 @@ var Geom = function (_Base) {
       for (var k in origin) {
         obj[k] = origin[k];
       }
-      // const obj = Util.mix({}, origin);
       obj[FIELD_ORIGIN] = origin;
       rst.push(obj);
     }
@@ -2040,7 +2042,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @fileOverview the base class of scale
  * @author dxq613@gmail.com
  */
-
 var Util = __webpack_require__(0);
 
 /**
@@ -2049,51 +2050,35 @@ var Util = __webpack_require__(0);
  */
 
 var Scale = function () {
-
-  /**
-   * 获取默认的配置属性
-   * @protected
-   * @return {Object} 默认属性
-   */
-  Scale.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      /**
-       * type of the scale
-       * @type {String}
-       */
-      type: 'base',
-
-      /**
-       * 格式化函数,输出文本或者tick时的格式化函数
-       * @type {Function}
-       */
-      formatter: null,
-
-      /**
-       * 输出的值域
-       * @type {Array}
-       */
-      range: [0, 1],
-
-      /**
-       * 度量的标记
-       * @type {Array}
-       */
-      ticks: null,
-
-      /**
-       * 参与度量计算的值，可选项
-       * @type {Array}
-       */
-      values: []
-    };
+  Scale.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'base';
+    /**
+     * 格式化函数,输出文本或者tick时的格式化函数
+     * @type {Function}
+     */
+    this.formatter = null;
+    /**
+     * 输出的值域
+     * @type {Array}
+     */
+    this.range = [0, 1];
+    /**
+     * 度量的标记
+     * @type {Array}
+     */
+    this.ticks = null;
+    /**
+     * 参与度量计算的值，可选项
+     * @type {Array}
+     */
+    this.values = [];
   };
 
   function Scale(cfg) {
     _classCallCheck(this, Scale);
 
-    var defaultCfg = this.getDefaultCfg();
-    Util.mix(this, defaultCfg, cfg);
+    this._initDefaultCfg();
+    Util.mix(this, cfg);
     this.init();
   }
 
@@ -2270,51 +2255,6 @@ module.exports = G;
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/**
- * @fileOverview Base class of chart and geometry
- * @author dxq613@gmail.com
- */
-
-var Util = __webpack_require__(0);
-
-var Base = function () {
-  Base.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {};
-  };
-
-  function Base(cfg) {
-    _classCallCheck(this, Base);
-
-    var attrs = {};
-    var defaultCfg = this.getDefaultCfg();
-    this._attrs = attrs;
-    Util.mix(attrs, defaultCfg, cfg);
-  }
-
-  Base.prototype.get = function get(name) {
-    return this._attrs[name];
-  };
-
-  Base.prototype.set = function set(name, value) {
-    this._attrs[name] = value;
-  };
-
-  Base.prototype.destroy = function destroy() {
-    this._attrs = {};
-    this.destroyed = true;
-  };
-
-  return Base;
-}();
-
-module.exports = Base;
-
-/***/ }),
-/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2521,7 +2461,7 @@ var AttributeBase = function () {
 module.exports = AttributeBase;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2534,15 +2474,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Util = __webpack_require__(0);
 
 var Base = function () {
-  Base.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {};
-  };
+  Base.prototype._initDefaultCfg = function _initDefaultCfg() {};
 
   function Base(cfg) {
     _classCallCheck(this, Base);
 
-    var defaultCfg = this.getDefaultCfg();
-    Util.mix(this, defaultCfg, cfg);
+    this._initDefaultCfg();
+    Util.mix(this, cfg);
   }
 
   Base.prototype.processAdjust = function processAdjust() /* dataArray */{};
@@ -2553,7 +2491,7 @@ var Base = function () {
 module.exports = Base;
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -2705,7 +2643,7 @@ DomUtil = {
 module.exports = DomUtil;
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2719,20 +2657,13 @@ var KEYWORDS_PERCENT = {
 };
 
 var GuideBase = function () {
-  GuideBase.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      xScale: null,
-      yScale: null,
-      element: null
-    };
-  };
+  GuideBase.prototype._initDefaultCfg = function _initDefaultCfg() {};
 
   function GuideBase(cfg) {
     _classCallCheck(this, GuideBase);
 
-    var defaultCfg = this.getDefaultCfg();
-    cfg = Util.deepMix({}, defaultCfg, cfg);
-    Util.mix(this, cfg);
+    this._initDefaultCfg();
+    Util.deepMix(this, cfg);
   }
 
   GuideBase.prototype._getNormalizedValue = function _getNormalizedValue(val, scale) {
@@ -2805,7 +2736,7 @@ var GuideBase = function () {
 module.exports = GuideBase;
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -2853,7 +2784,7 @@ var ShapeUtil = {
 module.exports = ShapeUtil;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2861,15 +2792,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Util = __webpack_require__(0);
 
 var Base = function () {
-  Base.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {};
-  };
+  Base.prototype._initDefaultCfg = function _initDefaultCfg() {};
 
   function Base(cfg) {
     _classCallCheck(this, Base);
 
-    var defaultCfg = this.getDefaultCfg();
-    Util.mix(this, defaultCfg, cfg);
+    this._initDefaultCfg();
+    Util.mix(this, cfg);
 
     var start = void 0;
     var end = void 0;
@@ -2911,7 +2840,7 @@ var Base = function () {
 module.exports = Base;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2921,46 +2850,44 @@ var Global = __webpack_require__(1);
 var Vector2 = __webpack_require__(5);
 
 var Abastract = function () {
-  Abastract.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      /**
-       * 坐标点
-       * @type {Array}
-       */
-      ticks: [],
-      /**
-       * tick 的配置信息
-       * @type {Object}
-       */
-      tickLine: {},
-      /**
-       * 文本、tick跟坐标轴线的方向，默认是顺时针方向
-       * @type {Number}
-       */
-      offsetFactor: 1,
-      /**
-       * 上层图层
-       * @type {container}
-       */
-      frontContainer: null,
-      /**
-       * 下层图层
-       * @type {[type]}
-       */
-      backContainer: null,
-      /**
-       * 绘制栅格的点
-       * @type {Array}
-       */
-      gridPoints: []
-    };
+  Abastract.prototype._initDefaultCfg = function _initDefaultCfg() {
+    /**
+     * 坐标点
+     * @type {Array}
+     */
+    this.ticks = [];
+    /**
+     * tick 的配置信息
+     * @type {Object}
+     */
+    this.tickLine = {};
+    /**
+     * 文本、tick跟坐标轴线的方向，默认是顺时针方向
+     * @type {Number}
+     */
+    this.offsetFactor = 1;
+    /**
+     * 上层图层
+     * @type {container}
+     */
+    this.frontContainer = null;
+    /**
+     * 下层图层
+     * @type {[type]}
+     */
+    this.backContainer = null;
+    /**
+     * 绘制栅格的点
+     * @type {Array}
+     */
+    this.gridPoints = [];
   };
 
   function Abastract(cfg) {
     _classCallCheck(this, Abastract);
 
-    var defaultCfg = this.getDefaultCfg();
-    Util.mix(this, defaultCfg, cfg);
+    this._initDefaultCfg();
+    Util.mix(this, cfg);
     this.draw();
   }
 
@@ -3121,12 +3048,57 @@ var Abastract = function () {
 module.exports = Abastract;
 
 /***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * @fileOverview Base class of chart and geometry
+ * @author dxq613@gmail.com
+ */
+
+var Util = __webpack_require__(0);
+
+var Base = function () {
+  Base.prototype.getDefaultCfg = function getDefaultCfg() {
+    return {};
+  };
+
+  function Base(cfg) {
+    _classCallCheck(this, Base);
+
+    var attrs = {};
+    var defaultCfg = this.getDefaultCfg();
+    this._attrs = attrs;
+    Util.mix(attrs, defaultCfg, cfg);
+  }
+
+  Base.prototype.get = function get(name) {
+    return this._attrs[name];
+  };
+
+  Base.prototype.set = function set(name, value) {
+    this._attrs[name] = value;
+  };
+
+  Base.prototype.destroy = function destroy() {
+    this._attrs = {};
+    this.destroyed = true;
+  };
+
+  return Base;
+}();
+
+module.exports = Base;
+
+/***/ }),
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Util = __webpack_require__(0);
 var Shape = __webpack_require__(4);
-var ShapeUtil = __webpack_require__(14);
+var ShapeUtil = __webpack_require__(13);
 var Global = __webpack_require__(1);
 
 // regist line geom
@@ -3266,7 +3238,6 @@ module.exports = {
 
     // 设置字体
     if (shapeType === 'Text' && canvas && canvas.get('fontFamily')) {
-      cfg.attrs = cfg.attrs || {};
       cfg.attrs.fontFamily = cfg.attrs.fontFamily || canvas.get('fontFamily');
     }
 
@@ -3388,12 +3359,8 @@ module.exports = {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var Util = __webpack_require__(0);
-var Base = __webpack_require__(9);
+// const Base = require('../base');
 var MatrixUtil = __webpack_require__(55);
 
 // 是否未改变
@@ -3409,52 +3376,40 @@ var ALIAS_ATTRS_MAP = {
 
 var SHAPE_ATTRS = ['fillStyle', 'font', 'globalAlpha', 'lineCap', 'lineWidth', 'lineJoin', 'miterLimit', 'shadowBlur', 'shadowColor', 'shadowOffsetX', 'shadowOffsetY', 'strokeStyle', 'textAlign', 'textBaseline', 'lineDash'];
 
-var Element = function (_Base) {
-  _inherits(Element, _Base);
-
-  Element.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      /**
-       * 唯一标示
-       * @type {Number}
-       */
-      className: null,
-      /**
-       * Z轴的层叠关系，Z值越大离用户越近
-       * @type {Number}
-       */
+var Element = function () {
+  Element.prototype._initProperties = function _initProperties() {
+    this._attrs = {
       zIndex: 0,
-      /**
-       * Canvas对象
-       * @type: {Object}
-       */
-      canvas: null,
-      /**
-       * 父元素指针
-       * @type {Object}
-       */
-      parent: null,
-      /**
-       * 画布的上下文
-       * @type {Object}
-       */
-      context: null,
-      /**
-       * 是否显示
-       * @type {Boolean}
-       */
       visible: true,
-      /**
-       * 是否被销毁
-       * @type: {Boolean}
-       */
-      destroyed: false,
-      /**
-       * 图形属性
-       * @type {Object}
-       */
-      attrs: {}
+      destroyed: false
     };
+  };
+
+  function Element(cfg) {
+    _classCallCheck(this, Element);
+
+    this._initProperties();
+    Util.mix(this._attrs, cfg);
+
+    var attrs = this._attrs.attrs;
+    if (attrs) {
+      // 初始化图形属性
+      this.initAttrs(attrs);
+    }
+
+    this.initTransform(); // 初始化变换
+  }
+
+  Element.prototype.get = function get(name) {
+    return this._attrs[name];
+  };
+
+  Element.prototype.set = function set(name, value) {
+    this._attrs[name] = value;
+  };
+
+  Element.prototype.initAttrs = function initAttrs(attrs) {
+    this.attr(Util.mix(this.getDefaultAttrs(), attrs));
   };
 
   Element.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -3462,7 +3417,7 @@ var Element = function (_Base) {
   };
 
   Element.prototype._setAttr = function _setAttr(name, value) {
-    var attrs = this.get('attrs');
+    var attrs = this._attrs.attrs;
     var alias = ALIAS_ATTRS_MAP[name];
     if (alias) {
       attrs[alias] = value;
@@ -3471,31 +3426,16 @@ var Element = function (_Base) {
   };
 
   Element.prototype._getAttr = function _getAttr(name) {
-    return this.get('attrs')[name];
+    return this._attrs.attrs[name];
   };
 
   Element.prototype._afterAttrsSet = function _afterAttrsSet() {};
-
-  function Element(cfg) {
-    _classCallCheck(this, Element);
-
-    var _this = _possibleConstructorReturn(this, _Base.call(this, cfg));
-
-    var attrs = cfg && cfg.attrs || {};
-    _this.initAttrs(attrs);
-    _this.initTransform(); // 初始化变换
-    return _this;
-  }
-
-  Element.prototype.initAttrs = function initAttrs(attrs) {
-    this.attr(Util.mix(this.getDefaultAttrs(), attrs));
-  };
 
   Element.prototype.attr = function attr(name, value) {
     var self = this;
     var argumentsLen = arguments.length;
     if (argumentsLen === 0) {
-      return self.get('attrs');
+      return self._attrs.attrs;
     }
 
     if (Util.isObject(name)) {
@@ -3551,7 +3491,7 @@ var Element = function (_Base) {
   };
 
   Element.prototype.resetContext = function resetContext(context) {
-    var elAttrs = this.get('attrs');
+    var elAttrs = this._attrs.attrs;
     if (!this.get('isGroup')) {
       for (var k in elAttrs) {
         if (SHAPE_ATTRS.indexOf(k) > -1) {
@@ -3568,11 +3508,11 @@ var Element = function (_Base) {
   };
 
   Element.prototype.hasFill = function hasFill() {
-    return this.get('canFill') && this.get('attrs').fillStyle;
+    return this.get('canFill') && this._attrs.attrs.fillStyle;
   };
 
   Element.prototype.hasStroke = function hasStroke() {
-    return this.get('canStroke') && this.get('attrs').strokeStyle;
+    return this.get('canStroke') && this._attrs.attrs.strokeStyle;
   };
 
   Element.prototype.drawInner = function drawInner() /* context */{};
@@ -3786,7 +3726,7 @@ var Element = function (_Base) {
   };
 
   return Element;
-}(Base);
+}();
 
 module.exports = Element;
 
@@ -3814,12 +3754,14 @@ var Group = function (_Element) {
     return _possibleConstructorReturn(this, _Element.apply(this, arguments));
   }
 
-  Group.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Element.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
+  Group.prototype._initProperties = function _initProperties() {
+    this._attrs = {
+      zIndex: 0,
+      visible: true,
+      destroyed: false,
       isGroup: true,
       children: []
-    });
+    };
   };
 
   Group.prototype.drawInner = function drawInner(context) {
@@ -4064,31 +4006,34 @@ var Category = function (_Base) {
     return _possibleConstructorReturn(this, _Base.apply(this, arguments));
   }
 
-  /**
-   * @override
-   */
-  Category.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Base.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      /**
-       * type of the scale
-       * @type {String}
-       */
-      type: 'cat',
-
-      /**
-       * 自动生成标记时的个数
-       * @type {Number}
-       * @default null
-       */
-      tickCount: null,
-
-      /**
-       * 是否分类度量
-       * @type {Boolean}
-       */
-      isCategory: true
-    });
+  Category.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'cat';
+    /**
+     * 自动生成标记时的个数
+     * @type {Number}
+     * @default null
+     */
+    this.tickCount = null;
+    /**
+     * 是否分类度量
+     * @type {Boolean}
+     */
+    this.isCategory = true;
+    /**
+     * 输出的值域
+     * @type {Array}
+     */
+    this.range = [0, 1];
+    /**
+     * 度量的标记
+     * @type {Array}
+     */
+    this.ticks = null;
+    /**
+     * 参与度量计算的值，可选项
+     * @type {Array}
+     */
+    this.values = [];
   };
 
   /**
@@ -4263,7 +4208,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Geom = __webpack_require__(3);
-var ShapeUtil = __webpack_require__(14);
+var ShapeUtil = __webpack_require__(13);
 var Util = __webpack_require__(0);
 __webpack_require__(17);
 
@@ -4328,60 +4273,25 @@ module.exports = Path;
 var Global = __webpack_require__(1);
 var Util = __webpack_require__(0);
 
-// 已经排序后的数据查找距离最小的
-function findMinDistance(arr, scale) {
-  var count = arr.length;
-  // 日期类型的 values 经常上文本类型，所以需要转换一下
-  if (Util.isString(arr[0])) {
-    arr = arr.map(function (v) {
-      return scale.translate(v);
-    });
-  }
-  var distance = arr[1] - arr[0];
-  for (var i = 2; i < count; i++) {
-    var tmp = arr[i] - arr[i - 1];
-    if (distance > tmp) {
-      distance = tmp;
-    }
-  }
-  return distance;
-}
-
 var SizeMixin = {
   getDefalutSize: function getDefalutSize() {
     var defaultSize = this.get('defaultSize');
     if (!defaultSize) {
       var coord = this.get('coord');
       var xScale = this.getXScale();
-      var xValues = xScale.values;
       var dataArray = this.get('dataArray');
-      var count = void 0;
-      if (xScale.isLinear && xValues.length > 1) {
-        xValues.sort(function (a, b) {
-          return a - b;
-        });
-        var interval = findMinDistance(xValues, xScale);
-        count = (xScale.max - xScale.min) / interval;
-        if (xValues.length > count) {
-          count = xValues.length;
-        }
-      } else {
-        count = xValues.length;
-      }
+      var count = xScale.values.length;
       var range = xScale.range;
       var normalizeSize = 1 / count;
       var widthRatio = 1;
 
-      if (this.isInCircle()) {
+      if (coord && coord.isPolar) {
         if (coord.transposed && count > 1) {
           // 极坐标下多层环图
           widthRatio = Global.widthRatio.multiplePie;
         } else {
           widthRatio = Global.widthRatio.rose;
         }
-        /* if (dataArray.length > 1) {
-          normalizeSize *= (range[1] - range[0]);
-        } */
       } else {
         if (xScale.isLinear) {
           normalizeSize *= range[1] - range[0];
@@ -4414,14 +4324,18 @@ var SizeMixin = {
     return width;
   },
   _getWidth: function _getWidth() {
-    var coord = this.get('coord');
-    var width = void 0; // x轴的长度
-    if (this.isInCircle() && !coord.isTransposed) {
-      // 极坐标下 width 为弧长
-      width = (coord.endAngle - coord.startAngle) * coord.radius;
-    } else {
-      width = this.getDimWidth('x'); // 不需要判断transpose
+    var width = this.get('_width');
+    if (!width) {
+      var coord = this.get('coord');
+      if (coord && coord.isPolar && !coord.isTransposed) {
+        // 极坐标下 width 为弧长
+        width = (coord.endAngle - coord.startAngle) * coord.radius;
+      } else {
+        width = this.getDimWidth('x'); // 不需要判断transpose
+      }
+      this.set('_width', width);
     }
+
     return width;
   },
   _toNormalizedSize: function _toNormalizedSize(size) {
@@ -4557,7 +4471,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var Base = __webpack_require__(10);
+var Base = __webpack_require__(9);
 
 var Position = function (_Base) {
   _inherits(Position, _Base);
@@ -4660,7 +4574,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Base = __webpack_require__(10);
+var Base = __webpack_require__(9);
 
 var Shape = function (_Base) {
   _inherits(Shape, _Base);
@@ -4702,7 +4616,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Base = __webpack_require__(10);
+var Base = __webpack_require__(9);
 
 var Size = function (_Base) {
   _inherits(Size, _Base);
@@ -4734,7 +4648,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ColorUtil = __webpack_require__(32);
-var Base = __webpack_require__(10);
+var Base = __webpack_require__(9);
 var Util = __webpack_require__(0);
 
 var Color = function (_Base) {
@@ -5113,7 +5027,7 @@ module.exports = Interval;
 /* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Adjust = __webpack_require__(11);
+var Adjust = __webpack_require__(10);
 
 __webpack_require__(37);
 __webpack_require__(38);
@@ -5136,7 +5050,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  */
 
 var Util = __webpack_require__(0);
-var Adjust = __webpack_require__(11);
+var Adjust = __webpack_require__(10);
 var Global = __webpack_require__(1);
 
 var Dodge = function (_Adjust) {
@@ -5148,22 +5062,17 @@ var Dodge = function (_Adjust) {
     return _possibleConstructorReturn(this, _Adjust.apply(this, arguments));
   }
 
-  Dodge.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Adjust.prototype.getDefaultCfg.call(this);
-    Util.mix(cfg, {
-      /**
-       * 调整过程中,2个数据的间距
-       * @type {Number}
-       */
-      marginRatio: Global.widthRatio.dodgeMargin,
-
-      /**
-       * 调整占单位宽度的比例,例如：占2个分类间距的 1/2
-       * @type {Number}
-       */
-      dodgeRatio: Global.widthRatio.column
-    });
-    return cfg;
+  Dodge.prototype._initDefaultCfg = function _initDefaultCfg() {
+    /**
+     * 调整过程中,2个数据的间距
+     * @type {Number}
+     */
+    this.marginRatio = Global.widthRatio.dodgeMargin;
+    /**
+     * 调整占单位宽度的比例,例如：占2个分类间距的 1/2
+     * @type {Number}
+     */
+    this.dodgeRatio = Global.widthRatio.column;
   };
 
   Dodge.prototype.getDodgeOffset = function getDodgeOffset(range, index, count) {
@@ -5217,7 +5126,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  */
 
 var Util = __webpack_require__(0);
-var Adjust = __webpack_require__(11);
+var Adjust = __webpack_require__(10);
 
 var Stack = function (_Adjust) {
   _inherits(Stack, _Adjust);
@@ -5228,11 +5137,9 @@ var Stack = function (_Adjust) {
     return _possibleConstructorReturn(this, _Adjust.apply(this, arguments));
   }
 
-  Stack.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      xField: null,
-      yField: null
-    };
+  Stack.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.xField = null;
+    this.yField = null;
   };
 
   Stack.prototype.processAdjust = function processAdjust(dataArray) {
@@ -5275,7 +5182,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Base = __webpack_require__(15);
+var Base = __webpack_require__(14);
 var Vector2 = __webpack_require__(5);
 
 var Polar = function (_Base) {
@@ -5287,18 +5194,16 @@ var Polar = function (_Base) {
     return _possibleConstructorReturn(this, _Base.apply(this, arguments));
   }
 
-  Polar.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'polar',
-      startAngle: -Math.PI / 2,
-      endAngle: Math.PI * 3 / 2,
-      inner: 0,
-      innerRadius: 0, // alias
-      isPolar: true,
-      transposed: false,
-      center: null,
-      radius: null
-    };
+  Polar.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'polar';
+    this.startAngle = -Math.PI / 2;
+    this.endAngle = Math.PI * 3 / 2;
+    this.inner = 0;
+    this.innerRadius = 0; // alias
+    this.isPolar = true;
+    this.transposed = false;
+    this.center = null;
+    this.radius = null;
   };
 
   Polar.prototype.init = function init(start, end) {
@@ -5418,7 +5323,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Base = __webpack_require__(9);
+var Base = __webpack_require__(16);
 var Plot = __webpack_require__(42);
 var Util = __webpack_require__(0);
 var Coord = __webpack_require__(43);
@@ -5585,7 +5490,7 @@ var Chart = function (_Base) {
        * 过滤设置
        * @type {Object}
        */
-      filters: {},
+      filters: null,
       appendPadding: Global.appendPadding
     };
   };
@@ -5920,8 +5825,9 @@ var Chart = function (_Base) {
   };
 
   Chart.prototype.filter = function filter(field, condition) {
-    var filters = this.get('filters');
+    var filters = this.get('filters') || {};
     filters[field] = condition;
+    this.set('filters', filters);
   };
 
   /**
@@ -6008,7 +5914,7 @@ var Chart = function (_Base) {
     Chart.plugins.notify(this, 'clear'); // TODO: beforeClear afterClear
     this._removeGeoms();
     this._clearInner();
-    this.set('filters', {});
+    this.set('filters', null);
 
     var canvas = this.get('canvas');
     canvas.draw();
@@ -6256,7 +6162,7 @@ module.exports = Plot;
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Coord = __webpack_require__(15);
+var Coord = __webpack_require__(14);
 
 __webpack_require__(44);
 
@@ -6272,7 +6178,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Base = __webpack_require__(15);
+var Base = __webpack_require__(14);
 
 var Cartesian = function (_Base) {
   _inherits(Cartesian, _Base);
@@ -6283,12 +6189,10 @@ var Cartesian = function (_Base) {
     return _possibleConstructorReturn(this, _Base.apply(this, arguments));
   }
 
-  Cartesian.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'cartesian',
-      transposed: false,
-      isRect: true
-    };
+  Cartesian.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'cartesian';
+    this.transposed = false;
+    this.isRect = true;
   };
 
   Cartesian.prototype.init = function init(start, end) {
@@ -6497,7 +6401,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @fileOverview The measurement of linear data scale function
  * @author dxq613@gmail.com
  */
-
 var Base = __webpack_require__(7);
 var Util = __webpack_require__(0);
 var numberAuto = __webpack_require__(48);
@@ -6516,62 +6419,61 @@ var Linear = function (_Base) {
     return _possibleConstructorReturn(this, _Base.apply(this, arguments));
   }
 
-  /**
-   * @override
-   */
-  Linear.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Base.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      /**
-       * type of the scale
-       * @type {String}
-       */
-      type: 'linear',
-
-      /**
-       * 是否线性
-       * @type {Boolean}
-       * @readOnly
-       * @default true
-       */
-      isLinear: true,
-
-      /**
-       * min value of the scale
-       * @type {Number}
-       * @default null
-       */
-      min: null,
-
-      /**
-       * max value of the scale
-       * @type {Number}
-       * @default null
-       */
-      max: null,
-
-      /**
-       * 是否为了用户习惯，优化min,max和ticks，如果进行优化，则会根据生成的ticks调整min,max，否则舍弃(min,max)范围之外的ticks
-       * @type {Boolean}
-       * @default false
-       */
-      nice: true,
-
-      /**
-       * 自动生成标记时的个数
-       * @type {Number}
-       * @default null
-       */
-      tickCount: null,
-
-      /**
-       * 坐标轴点之间的间距，指的是真实数据的差值
-       * @type {Number}
-       * @default null
-       */
-      tickInterval: null
-    });
+  Linear.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'linear';
+    this.isLinear = true;
+    /**
+      * min value of the scale
+      * @type {Number}
+      * @default null
+      */
+    this.min = null;
+    /**
+      * max value of the scale
+      * @type {Number}
+      * @default null
+      */
+    this.max = null;
+    /**
+      * 是否为了用户习惯，优化min,max和ticks，如果进行优化，则会根据生成的ticks调整min,max，否则舍弃(min,max)范围之外的ticks
+      * @type {Boolean}
+      * @default false
+      */
+    this.nice = true;
+    /**
+      * 自动生成标记时的个数
+      * @type {Number}
+      * @default null
+      */
+    this.tickCount = null;
+    /**
+      * 坐标轴点之间的间距，指的是真实数据的差值
+      * @type {Number}
+      * @default null
+      */
+    this.tickInterval = null;
+    /**
+     * 格式化函数,输出文本或者tick时的格式化函数
+     * @type {Function}
+     */
+    this.formatter = null;
+    /**
+     * 输出的值域
+     * @type {Array}
+     */
+    this.range = [0, 1];
+    /**
+     * 度量的标记
+     * @type {Array}
+     */
+    this.ticks = null;
+    /**
+     * 参与度量计算的值，可选项
+     * @type {Array}
+     */
+    this.values = [];
   };
+
   /**
    * @protected
    * @override
@@ -6987,7 +6889,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  * @fileOverview The data is replaced with constant
  * @author dxq613@gmail.com
  */
-
 var Base = __webpack_require__(7);
 var Util = __webpack_require__(0);
 
@@ -7000,25 +6901,19 @@ var Identity = function (_Base) {
     return _possibleConstructorReturn(this, _Base.apply(this, arguments));
   }
 
-  /**
-   * @override
-   */
-  Identity.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Base.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      isIdentity: true,
-      /**
-       * @override
-       * @type {String}
-       */
-      type: 'identity',
-
-      /**
-       * 常量值
-       * @type {*}
-       */
-      value: null
-    });
+  Identity.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.isIdentity = true;
+    this.type = 'identity';
+    /**
+     * 输出的值域
+     * @type {Array}
+     */
+    this.range = [0, 1];
+    /**
+     * 常量值
+     * @type {*}
+     */
+    this.value = null;
   };
 
   /**
@@ -7441,7 +7336,7 @@ module.exports = AxisController;
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Abstract = __webpack_require__(16);
+var Abstract = __webpack_require__(15);
 
 // require('./circle');
 __webpack_require__(53);
@@ -7459,7 +7354,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var Abstract = __webpack_require__(16);
+var Abstract = __webpack_require__(15);
 
 var Line = function (_Abstract) {
   _inherits(Line, _Abstract);
@@ -7470,12 +7365,10 @@ var Line = function (_Abstract) {
     return _possibleConstructorReturn(this, _Abstract.apply(this, arguments));
   }
 
-  Line.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Abstract.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      start: null,
-      end: null
-    });
+  Line.prototype._initDefaultCfg = function _initDefaultCfg() {
+    _Abstract.prototype._initDefaultCfg.call(this);
+    this.start = null;
+    this.end = null;
   };
   // 获取坐标轴上的点
 
@@ -7528,39 +7421,29 @@ module.exports = Line;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var Util = __webpack_require__(0);
-var DOMUtil = __webpack_require__(12);
-var Base = __webpack_require__(9);
+var DOMUtil = __webpack_require__(11);
 var Container = __webpack_require__(18);
 var Group = __webpack_require__(20);
 
-var Canvas = function (_Base) {
-  _inherits(Canvas, _Base);
+var Canvas = function () {
+  Canvas.prototype.get = function get(name) {
+    return this._attrs[name];
+  };
 
-  Canvas.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'canvas',
-      el: null,
-      context: null,
-      width: null,
-      height: null,
-      children: [],
-      pixelRatio: null
-    };
+  Canvas.prototype.set = function set(name, value) {
+    this._attrs[name] = value;
   };
 
   function Canvas(cfg) {
     _classCallCheck(this, Canvas);
 
-    var _this = _possibleConstructorReturn(this, _Base.call(this, cfg));
-
-    _this._initPixelRatio();
-    _this._initCanvas();
-    return _this;
+    this._attrs = Util.mix({
+      type: 'canvas',
+      children: []
+    }, cfg);
+    this._initPixelRatio();
+    this._initCanvas();
   }
 
   Canvas.prototype._initPixelRatio = function _initPixelRatio() {
@@ -7720,7 +7603,7 @@ var Canvas = function (_Base) {
   };
 
   return Canvas;
-}(Base);
+}();
 
 Util.mix(Canvas.prototype, Container, {
   getGroupClass: function getGroupClass() {
@@ -7781,13 +7664,11 @@ var Rect = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Rect.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canFill: true,
-      canStroke: true,
-      type: 'rect'
-    });
+  Rect.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'rect';
   };
 
   Rect.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -7807,24 +7688,25 @@ var Rect = function (_Shape) {
     var x = attrs.x,
         y = attrs.y,
         width = attrs.width,
-        height = attrs.height,
-        radius = attrs.radius;
+        height = attrs.height;
 
     context = context || self.get('context');
 
     context.beginPath();
-    if (radius === 0) {
+    var radius = attrs.radius;
+    if (!radius) {
       context.rect(x, y, width, height);
     } else {
-      context.moveTo(x + radius, y);
-      context.lineTo(x + width - radius, y);
-      context.arc(x + width - radius, y + radius, radius, -Math.PI / 2, 0, false);
-      context.lineTo(x + width, y + height - radius);
-      context.arc(x + width - radius, y + height - radius, radius, 0, Math.PI / 2, false);
-      context.lineTo(x + radius, y + height);
-      context.arc(x + radius, y + height - radius, radius, Math.PI / 2, Math.PI, false);
-      context.lineTo(x, y + radius);
-      context.arc(x + radius, y + radius, radius, Math.PI, Math.PI * 3 / 2, false);
+      radius = Util.parsePadding(radius);
+      context.moveTo(x + radius[0], y);
+      context.lineTo(x + width - radius[1], y);
+      context.arc(x + width - radius[1], y + radius[1], radius[1], -Math.PI / 2, 0, false);
+      context.lineTo(x + width, y + height - radius[2]);
+      context.arc(x + width - radius[2], y + height - radius[2], radius[2], 0, Math.PI / 2, false);
+      context.lineTo(x + radius[3], y + height);
+      context.arc(x + radius[3], y + height - radius[3], radius[3], Math.PI / 2, Math.PI, false);
+      context.lineTo(x, y + radius[0]);
+      context.arc(x + radius[0], y + radius[0], radius[0], Math.PI, Math.PI * 3 / 2, false);
       context.closePath();
     }
   };
@@ -7860,7 +7742,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 
 var Circle = function (_Shape) {
@@ -7872,13 +7753,11 @@ var Circle = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Circle.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canFill: true,
-      canStroke: true,
-      type: 'circle'
-    });
+  Circle.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'circle';
   };
 
   Circle.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -7933,7 +7812,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 var bbox = __webpack_require__(6);
 
@@ -7946,12 +7824,10 @@ var Line = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Line.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canStroke: true,
-      type: 'line'
-    });
+  Line.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canStroke = true;
+    this._attrs.type = 'line';
   };
 
   Line.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8004,7 +7880,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 var bbox = __webpack_require__(6);
 
@@ -8017,13 +7892,11 @@ var Polygon = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Polygon.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canFill: true,
-      canStroke: true,
-      type: 'polygon'
-    });
+  Polygon.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'polygon';
   };
 
   Polygon.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8077,7 +7950,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 var Smooth = __webpack_require__(21);
 var bbox = __webpack_require__(6);
@@ -8091,13 +7963,11 @@ var Polyline = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Polyline.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canStroke: true,
-      canFill: true,
-      type: 'polyline'
-    });
+  Polyline.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'polyline';
   };
 
   Polyline.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8178,7 +8048,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 var bbox = __webpack_require__(6);
 
@@ -8191,12 +8060,10 @@ var Arc = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Arc.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canStroke: true,
-      type: 'arc'
-    });
+  Arc.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canStroke = true;
+    this._attrs.type = 'arc';
   };
 
   Arc.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8255,7 +8122,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 var bbox = __webpack_require__(6);
 
@@ -8268,13 +8134,11 @@ var Sector = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Sector.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canFill: true,
-      canStroke: true,
-      type: 'sector'
-    });
+  Sector.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'sector';
   };
 
   Sector.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8352,7 +8216,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var DOMUtil = __webpack_require__(12);
+var DOMUtil = __webpack_require__(11);
 var Shape = __webpack_require__(2);
 
 var dummyContext = void 0;
@@ -8369,13 +8233,11 @@ var Text = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Text.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canFill: true,
-      canStroke: true,
-      type: 'text'
-    });
+  Text.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'text';
   };
 
   Text.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -8608,7 +8470,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Util = __webpack_require__(0);
 var Shape = __webpack_require__(2);
 
 var Custom = function (_Shape) {
@@ -8620,14 +8481,12 @@ var Custom = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Custom.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      type: 'custom',
-      createPath: null,
-      canFill: true,
-      canStroke: true
-    });
+  Custom.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.createPath = null;
+    this._attrs.type = 'custom';
   };
 
   Custom.prototype.createPath = function createPath(context) {
@@ -9164,13 +9023,11 @@ var Marker = function (_Shape) {
     return _possibleConstructorReturn(this, _Shape.apply(this, arguments));
   }
 
-  Marker.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Shape.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      canStroke: true,
-      canFill: true,
-      type: 'marker'
-    });
+  Marker.prototype._initProperties = function _initProperties() {
+    _Shape.prototype._initProperties.call(this);
+    this._attrs.canFill = true;
+    this._attrs.canStroke = true;
+    this._attrs.type = 'marker';
   };
 
   Marker.prototype.getDefaultAttrs = function getDefaultAttrs() {
@@ -9270,7 +9127,7 @@ module.exports = Point;
 
 var Util = __webpack_require__(0);
 var Global = __webpack_require__(1);
-var ShapeUtil = __webpack_require__(14);
+var ShapeUtil = __webpack_require__(13);
 var Shape = __webpack_require__(4);
 var SHAPES = ['circle', 'hollowCircle', 'rect'];
 
@@ -9355,7 +9212,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  */
 
 var Geom = __webpack_require__(3);
-var ShapeUtil = __webpack_require__(14);
+var ShapeUtil = __webpack_require__(13);
 var Util = __webpack_require__(0);
 __webpack_require__(71);
 
@@ -9561,7 +9418,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var Abstract = __webpack_require__(16);
+var Abstract = __webpack_require__(15);
 
 var Circle = function (_Abstract) {
   _inherits(Circle, _Abstract);
@@ -9572,30 +9429,12 @@ var Circle = function (_Abstract) {
     return _possibleConstructorReturn(this, _Abstract.apply(this, arguments));
   }
 
-  Circle.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Abstract.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      /**
-       * 起始角度，弧度
-       * @type {Number}
-       */
-      startAngle: -Math.PI / 2,
-      /**
-       * 结束角度，弧度
-       * @type {Number}
-       */
-      endAngle: Math.PI * 3 / 2,
-      /**
-       * 半径
-       * @type {Number}
-       */
-      radius: null,
-      /**
-       * 圆心
-       * @type {Object}
-       */
-      center: null
-    });
+  Circle.prototype._initDefaultCfg = function _initDefaultCfg() {
+    _Abstract.prototype._initDefaultCfg.call(this);
+    this.startAngle = -Math.PI / 2; // 起始角度，弧度
+    this.endAngle = Math.PI * 3 / 2; // 结束角度，弧度
+    this.radius = null; // 半径
+    this.center = null; // 圆心
   };
 
   // 获取坐标轴上的点
@@ -9714,29 +9553,34 @@ var TimeCategory = function (_Category) {
     return _possibleConstructorReturn(this, _Category.apply(this, arguments));
   }
 
-  /**
-   * @override
-   */
-  TimeCategory.prototype.getDefaultCfg = function getDefaultCfg() {
-    var cfg = _Category.prototype.getDefaultCfg.call(this);
-    return Util.mix({}, cfg, {
-      /**
-       * @override
-       */
-      type: 'timeCat',
-
-      /**
-       * 格式化符
-       * @type {String}
-       */
-      mask: 'YYYY-MM-DD',
-
-      /**
-       * @override
-       */
-      tickCount: 5,
-      sortable: true
-    });
+  TimeCategory.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'timeCat';
+    /**
+     * 是否需要排序，默认进行排序
+     * @type {Boolean}
+     */
+    this.sortable = true;
+    this.tickCount = 5;
+    /**
+     * 时间格式化
+     * @type {String}
+     */
+    this.mask = 'YYYY-MM-DD';
+    /**
+     * 输出的值域
+     * @type {Array}
+     */
+    this.range = [0, 1];
+    /**
+     * 度量的标记
+     * @type {Array}
+     */
+    this.ticks = null;
+    /**
+     * 参与度量计算的值，可选项
+     * @type {Array}
+     */
+    this.values = [];
   };
 
   TimeCategory.prototype.init = function init() {
@@ -10268,7 +10112,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var GuideBase = __webpack_require__(13);
+var GuideBase = __webpack_require__(12);
 
 var Text = function (_GuideBase) {
   _inherits(Text, _GuideBase);
@@ -10279,37 +10123,35 @@ var Text = function (_GuideBase) {
     return _possibleConstructorReturn(this, _GuideBase.apply(this, arguments));
   }
 
-  Text.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'text',
-      /**
-       * 辅助文本的位置
-       * @type {Object | Function | Array}
-       */
-      position: null,
-      /**
-       * 辅助文本的显示文字
-       * @type {String}
-       */
-      content: null,
-      /**
-       * 辅助文本的样式配置
-       * @type {Object}
-       */
-      style: {
-        fill: '#000'
-      },
-      /**
-       * x 方向的偏移量
-       * @type {Number}
-       */
-      offsetX: 0,
-      /**
-       * y 方向的偏移量
-       * @type {Number}
-       */
-      offsetY: 0
+  Text.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'text';
+    /**
+     * 辅助文本的位置
+     * @type {Object | Function | Array}
+     */
+    this.position = null;
+    /**
+     * 辅助文本的显示文字
+     * @type {String}
+     */
+    this.content = null;
+    /**
+     * 辅助文本的样式配置
+     * @type {Object}
+     */
+    this.style = {
+      fill: '#000'
     };
+    /**
+     * x 方向的偏移量
+     * @type {Number}
+     */
+    this.offsetX = 0;
+    /**
+     * y 方向的偏移量
+     * @type {Number}
+     */
+    this.offsetY = 0;
   };
 
   Text.prototype.render = function render(coord, container) {
@@ -10357,7 +10199,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var GuideBase = __webpack_require__(13);
+var GuideBase = __webpack_require__(12);
 
 var Line = function (_GuideBase) {
   _inherits(Line, _GuideBase);
@@ -10368,15 +10210,13 @@ var Line = function (_GuideBase) {
     return _possibleConstructorReturn(this, _GuideBase.apply(this, arguments));
   }
 
-  Line.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'line',
-      start: [],
-      end: [],
-      style: {
-        stroke: '#000',
-        lineWidth: 1
-      }
+  Line.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'line';
+    this.start = [];
+    this.end = [];
+    this.style = {
+      stroke: '#000',
+      lineWidth: 1
     };
   };
 
@@ -10413,7 +10253,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var GuideBase = __webpack_require__(13);
+var GuideBase = __webpack_require__(12);
 
 var Arc = function (_GuideBase) {
   _inherits(Arc, _GuideBase);
@@ -10424,27 +10264,25 @@ var Arc = function (_GuideBase) {
     return _possibleConstructorReturn(this, _GuideBase.apply(this, arguments));
   }
 
-  Arc.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'arc',
-      /**
-       * 起点
-       * @type {Array | Function}
-       */
-      start: [],
-      /**
-       * 终点
-       * @type {Array | Function}
-       */
-      end: [],
-      /**
-       * 辅助文本的样式配置
-       * @type {Object}
-       */
-      style: {
-        stroke: '#999',
-        lineWidth: 1
-      }
+  Arc.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'arc';
+    /**
+     * 起点
+     * @type {Array | Function}
+     */
+    this.start = [];
+    /**
+     * 终点
+     * @type {Array | Function}
+     */
+    this.end = [];
+    /**
+     * 辅助文本的样式配置
+     * @type {Object}
+     */
+    this.style = {
+      stroke: '#999',
+      lineWidth: 1
     };
   };
 
@@ -10486,7 +10324,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Util = __webpack_require__(0);
-var GuideBase = __webpack_require__(13);
+var GuideBase = __webpack_require__(12);
 
 var Rect = function (_GuideBase) {
   _inherits(Rect, _GuideBase);
@@ -10497,15 +10335,13 @@ var Rect = function (_GuideBase) {
     return _possibleConstructorReturn(this, _GuideBase.apply(this, arguments));
   }
 
-  Rect.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'region',
-      start: [],
-      end: [],
-      style: {
-        fill: '#CCD7EB',
-        opacity: 0.4
-      }
+  Rect.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'region';
+    this.start = [];
+    this.end = [];
+    this.style = {
+      fill: '#CCD7EB',
+      opacity: 0.4
     };
   };
 
@@ -10540,8 +10376,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var DOMUtil = __webpack_require__(12);
-var GuideBase = __webpack_require__(13);
+var DOMUtil = __webpack_require__(11);
+var GuideBase = __webpack_require__(12);
 
 function getOffsetFromAlign(alignX, alignY, width, height) {
   var result = [];
@@ -10587,40 +10423,38 @@ var Html = function (_GuideBase) {
     return _possibleConstructorReturn(this, _GuideBase.apply(this, arguments));
   }
 
-  Html.prototype.getDefaultCfg = function getDefaultCfg() {
-    return {
-      type: 'html',
-      /**
-       * dom 显示位置点
-       * @type {Object | Array}
-       */
-      position: null,
-      /**
-       * 水平方向对齐方式，可取值 'left'、'center'、'right'
-       * @type {String}
-       */
-      alignX: 'center',
-      /**
-       * 垂直方向对齐方式，可取值 'top'、'middle'、'bottom'
-       * @type {String}
-       */
-      alignY: 'middle',
-      /**
-       * x 方向的偏移量
-       * @type {Number}
-       */
-      offsetX: null,
-      /**
-       * y 方向的偏移量
-       * @type {Number}
-       */
-      offsetY: null,
-      /**
-      * html内容
-      *@type {String | Function}
+  Html.prototype._initDefaultCfg = function _initDefaultCfg() {
+    this.type = 'html';
+    /**
+     * dom 显示位置点
+     * @type {Object | Array}
+     */
+    this.position = null;
+    /**
+      * 水平方向对齐方式，可取值 'left'、'center'、'right'
+      * @type {String}
       */
-      html: null
-    };
+    this.alignX = 'center';
+    /**
+      * 垂直方向对齐方式，可取值 'top'、'middle'、'bottom'
+      * @type {String}
+      */
+    this.alignY = 'middle';
+    /**
+      * x 方向的偏移量
+      * @type {Number}
+      */
+    this.offsetX = null;
+    /**
+      * y 方向的偏移量
+      * @type {Number}
+      */
+    this.offsetY = null;
+    /**
+    * html内容
+    *@type {String | Function}
+    */
+    this.html = null;
   };
 
   // override paint
@@ -10701,7 +10535,7 @@ module.exports = Html;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Util = __webpack_require__(0);
-var Guide = __webpack_require__(13);
+var Guide = __webpack_require__(12);
 var Global = __webpack_require__(1);
 
 // register the default configuration for Guide
@@ -10863,7 +10697,7 @@ module.exports = {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Util = __webpack_require__(0);
-var DomUtil = __webpack_require__(12);
+var DomUtil = __webpack_require__(11);
 var List = __webpack_require__(65);
 var Global = __webpack_require__(1);
 var LEGEND_GAP = 12;
@@ -11109,7 +10943,10 @@ var LegendController = function () {
 
   LegendController.prototype._alignLegend = function _alignLegend(legend, pre, position) {
     var self = this;
-    var plotRange = self.plotRange;
+    var _self$plotRange = self.plotRange,
+        tl = _self$plotRange.tl,
+        bl = _self$plotRange.bl;
+
     var chart = self.chart;
     var offsetX = legend.offsetX || 0;
     var offsetY = legend.offsetY || 0;
@@ -11122,16 +10959,30 @@ var LegendController = function () {
     var x = 0;
     var y = 0;
     if (position === 'left' || position === 'right') {
-      // position 为 left、right，图例整体居中对齐
-      var height = Math.abs(plotRange.tl.y - plotRange.bl.y);
+      // position 为 left、right，默认图例整体居中对齐
+      var verticalAlign = legend.verticalAlign || 'middle'; // 图例垂直方向上的对齐方式
+      var height = Math.abs(tl.y - bl.y);
       x = position === 'left' ? appendPadding : chartWidth - legendWidth - appendPadding;
-      y = (height - legendHeight) / 2 + plotRange.tl.y;
+      y = (height - legendHeight) / 2 + tl.y;
+      if (verticalAlign === 'top') {
+        y = tl.y;
+      } else if (verticalAlign === 'bottom') {
+        y = bl.y - legendHeight;
+      }
+
       if (pre) {
         y = pre.get('y') - legendHeight - LEGEND_GAP;
       }
     } else {
       // position 为 top、bottom，图例整体居左对齐
+      var align = legend.align || 'left'; // 图例水平方向上的对齐方式
       x = appendPadding;
+
+      if (align === 'center') {
+        x = chartWidth / 2 - legendWidth / 2;
+      } else if (align === 'right') {
+        x = chartWidth - (legendWidth + appendPadding);
+      }
       y = position === 'top' ? legendHeight / 2 + appendPadding : chartHeigth - legendHeight / 2 - appendPadding;
       if (pre) {
         var preWidth = pre.getWidth();
@@ -11333,7 +11184,7 @@ module.exports = {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Util = __webpack_require__(0);
-var DomUtil = __webpack_require__(12);
+var DomUtil = __webpack_require__(11);
 var Global = __webpack_require__(1);
 var Tooltip = __webpack_require__(85);
 
@@ -11960,11 +11811,18 @@ var Tooltip = function () {
 
       if (tooltipArrow) {
         tooltipArrow.attr('points', [{ x: _x - 3, y: tl.y - GAP + offsetY }, { x: _x + 3, y: tl.y - GAP + offsetY }, { x: _x, y: tl.y + offsetY }]);
+        var backShape = container.backShape;
+        var radius = Util.parsePadding(backShape.attr('radius'));
         if (_x === tl.x) {
+          radius[3] = 0;
+
           tooltipArrow.attr('points', [{ x: tl.x, y: tl.y + offsetY }, { x: tl.x, y: tl.y - GAP + offsetY }, { x: tl.x + GAP, y: tl.y - GAP + offsetY }]);
         } else if (_x === tr.x) {
+          radius[2] = 0;
+
           tooltipArrow.attr('points', [{ x: tr.x, y: tl.y + offsetY }, { x: tr.x - GAP, y: tl.y - GAP + offsetY }, { x: tr.x, y: tl.y - GAP + offsetY }]);
         }
+        backShape.attr('radius', radius);
       }
     }
 
@@ -12379,4 +12237,3 @@ module.exports = Schema;
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=f2.js.map
