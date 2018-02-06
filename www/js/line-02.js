@@ -22,7 +22,9 @@
       range: [ 0, 1 ]
     }
   });
-  chart.tooltip(false)
+  chart.tooltip({
+    showCrosshairs: true
+  });
   chart.axis('month', {
     label(text, index, total) {
       const textCfg = {};
@@ -38,7 +40,7 @@
   chart.line().position('month*temperature').shape('smooth');
   chart.point().position('month*temperature').style({
     stroke: '#fff',
-    lineWidth: 2
+    lineWidth: 1
   });
   chart.render();
 })();

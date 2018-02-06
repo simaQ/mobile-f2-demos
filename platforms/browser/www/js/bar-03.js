@@ -51,7 +51,7 @@
       return textCfg;
     }
   });
-  chart.tooltip(false);
+  chart.legend(false);
   chart.interval().position('State*人口数量').color('年龄段').adjust('stack');
 
   chart.render();

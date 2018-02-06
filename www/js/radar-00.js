@@ -61,7 +61,6 @@
       if (index === total - 1) {
         return null;
       }
-
       return {
         top: true
       };
@@ -77,10 +76,10 @@
       top: false
     }
   });
-  chart.line().position('item*score').color('user').size(2);
+  chart.line().position('item*score').color('user');
   chart.point().position('item*score').color('user').style({
     stroke: '#fff',
-    lineWidth: 2
+    lineWidth: 1
   });
   chart.render();
 })();

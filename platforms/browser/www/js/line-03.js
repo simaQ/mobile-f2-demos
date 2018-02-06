@@ -118,7 +118,7 @@
       tickCount: 5
     }
   });
-  chart.tooltip(false);
+  chart.legend(false);
   chart.axis('date', {
     label(text, index, total) {
       const textCfg = {};

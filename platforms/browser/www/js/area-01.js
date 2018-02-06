@@ -45,7 +45,7 @@
       if (text === '0') {
         return {
           lineDash: null,
-          lineWidth: 2
+          lineWidth: 1
         };
       }
     }

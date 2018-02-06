@@ -22,7 +22,8 @@
   });
   chart.coord('polar');
   chart.legend({
-    position: 'right'
+    position: 'right',
+    triggerOn: 'touchstart'
   });
   chart.tooltip({
     offsetY: -20
@@ -37,6 +38,9 @@
           lineDash: null
         };
       }
+    },
+    line: {
+      top: false
     }
   });
   chart.interval()

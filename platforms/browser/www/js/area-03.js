@@ -36,9 +36,10 @@
     { month: 10, tem: 3.9, city: 'Berlin' },
     { month: 11, tem: 1, city: 'Berlin' },
     { month: 12, tem: 2, city: 'Berlin' }
+
   ];
   const chart = new F2.Chart({
-    id: 'area4',
+    id: 'area3',
     width: window.innerWidth,
     height: window.innerWidth * 0.64,
     pixelRatio: window.devicePixelRatio
@@ -65,28 +66,9 @@
       return textCfg;
     }
   });
+  chart.legend(false);
   chart.tooltip({
     showCrosshairs: true,
-    custom(obj) {
-      const legend = chart.get('legendController').legends.top[0];
-      const tooltipItems = obj.items;
-      const legendItems = legend.items;
-      const map = {};
-      legendItems.map(item => {
-        map[item.name] = _.clone(item);
-      });
-      tooltipItems.map(item => {
-        const { name, value } = item;
-        if (map[name]) {
-          map[name].value = value;
-        }
-      });
-      legend.setItems(Object.values(map));
-    },
-    onHide(tooltip) {
-      const legend = chart.get('legendController').legends.top[0];
-      legend.setItems(chart.getLegendItems().country);
-    }
   });
   chart.area().position('month*tem').color('city')
     .shape('smooth')

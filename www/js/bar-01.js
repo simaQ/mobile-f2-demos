@@ -2,8 +2,8 @@
   const data = [
     { label: 'Mon.', type: 'series1', value: 2800 },
     { label: 'Mon.', type: 'series2', value: 2260 },
-    { label: 'Tue..', type: 'series1', value: 1800 },
-    { label: 'Tue..', type: 'series2', value: 1300 },
+    { label: 'Tue.', type: 'series1', value: 1800 },
+    { label: 'Tue.', type: 'series2', value: 1300 },
     { label: 'Wed.', type: 'series1', value: 950 },
     { label: 'Wed.', type: 'series2', value: 900 },
     { label: 'Thu.', type: 'series1', value: 500 },
