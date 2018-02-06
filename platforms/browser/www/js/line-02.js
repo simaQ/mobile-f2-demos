@@ -1,10 +1,10 @@
 (() => {
-   const data = [
-    { month: 'AUG', temperature: 16.5 },
-    { month: 'SEP', temperature: 23.3 },
-    { month: 'OCT', temperature: 18.3 },
-    { month: 'NOV', temperature: 13.9 },
-    { month: 'DEC', temperature: 29.6 }
+  const data = [
+    { month: 'Aug.', temperature: 16.5 },
+    { month: 'Sep.', temperature: 23.3 },
+    { month: 'Oct.', temperature: 18.3 },
+    { month: 'Nov.', temperature: 13.9 },
+    { month: 'Dec.', temperature: 29.6 }
   ];
   const chart = new F2.Chart({
     id: 'line2',

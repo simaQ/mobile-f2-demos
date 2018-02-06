@@ -1,5 +1,5 @@
 (() => {
-  $.getJSON('../data/bubble.json', data => {
+  $.getJSON('https://gw.alipayobjects.com/os/rmsportal/hicjNXYpVBvsbMDqXSMI.json', data => {
     const chart = new F2.Chart({
       id: 'scatter2',
       width: window.innerWidth,

@@ -13,7 +13,12 @@
 
 <body class="drawer-open">
     <header class="chart-header">
-      <h1>散点图</h1>
+      <h1>
+        散点图
+        <a href="./index.html">
+          返回<span class="iconfont icon-arrowright"></span>
+        </a>
+      </h1>
     </header>
 
     <section class="chart">
@@ -55,25 +60,7 @@
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
     <script src="js/f2.js"></script>
-    <script>
-      var $body = $(document.body);
-      var DRAWER_TOGGLE_SELECTOR = '.drawer-toggle';
-      var DRAWER_OPEN = 'drawer-open';
-      var $toggle = $(DRAWER_TOGGLE_SELECTOR);
-
-      $toggle.on('click', function () {
-          $body.toggleClass(DRAWER_OPEN);
-          if ($body.hasClass(DRAWER_OPEN)) {
-              $toggle.find('.iconfont').removeClass('icon-menu-fold').addClass('icon-menu-unfold');
-              $('#mySidenav').css('width', 0);
-              $toggle.css('left', 0);
-          } else {
-              $toggle.find('.iconfont').removeClass('icon-menu-unfold').addClass('icon-menu-fold');
-              $('#mySidenav').css('width', '250px');
-              $toggle.css('left', '250px');
-          }
-      });
-    </script>
+    <script src="js/drawer.js"></script>
     <script src="js/scatter-00.js"></script>
     <script src="js/scatter-01.js"></script>
     <script src="js/scatter-02.js"></script>

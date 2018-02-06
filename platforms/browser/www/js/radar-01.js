@@ -43,6 +43,10 @@
       if (index === total - 1) {
         return null;
       }
+
+      return {
+        top: true
+      };
     },
     grid(text, index) {
       if (text === '120') {

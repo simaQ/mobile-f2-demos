@@ -22,7 +22,7 @@
   });
   chart.coord('polar');
   chart.legend({
-    position: 'left'
+    position: 'right'
   });
   chart.tooltip({
     offsetY: -20
